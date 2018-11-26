@@ -1,7 +1,8 @@
-#MLH Hackathon 2018
-## Group: Chris Cadonic and Cassandra Aldaba
+## MLH Hackathon 2018
 
-# Project: Detecting patients becoming immobile when waiting in emergency room waiting areas
+### Contributors: Chris Cadonic and Cassandra Aldaba
+
+## Project: Detecting patients becoming immobile when waiting in emergency room waiting areas
 
 ## Setup
 
@@ -28,4 +29,6 @@ In either system, the *config.yaml* contains hyperparameters for cnn training, s
 
 ## Running
 
-As the project is yet to be implemented, there's much to discuss here. Though, it is assumed that if the jupyter notebook route is taken then running the kernel will run cell by cell. Otherwise, `main.py` will handle running the system.
+As the project is yet to be implemented, there's much to discuss here. Though, it is assumed that if the jupyter notebook route is taken then running the kernel will run cell by cell. Otherwise, `main.py` will handle running the system as:
+
+`python main.py`
