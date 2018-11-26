@@ -5,7 +5,15 @@
 
 ## Setup
 
-The working environment is stored in the requirements file *requirements.txt*. Environment can be loaded/updated using pip:
+If using anaconda, the working environment can be created from the conda environment .yml:
+
+`conda create -f conda_env.yml`
+
+if there are errors, it may be due to conda-forge not being listed as a channel for anaconda to look for packages, this can be solved by first adding it:
+
+`conda config --add channels conda-forge`
+
+The working environment is also stored in the requirements file *requirements.txt*. Environment can be loaded/updated using pip:
 
 `pip install -r requirements.txt`
 
