@@ -1,0 +1,23 @@
+# Parameters for the patient movement detection program
+#=====================================#
+
+traindir: vids/
+outputdir: output/
+
+approach: lk
+
+# neural network parameters
+#=====================================#
+cnn:
+  optimizer: adam
+  lr: 0.001
+
+  epochs: 50
+  batch_size: 10
+
+# hierarchical Lucas Kanade parameters
+#=====================================#
+lk:
+  pyramid_size: 5
+
+
