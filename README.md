@@ -2,7 +2,7 @@
 
 ### Contributors: Chris Cadonic and Cassandra Aldaba
 
-## Project: Detecting patients becoming immobile when waiting in emergency room waiting areas
+## Project: ERVA - Emergency Room Video Assistant
 
 ## Setup
 
