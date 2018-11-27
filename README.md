@@ -32,3 +32,10 @@ In either system, the *config.yaml* contains hyperparameters for cnn training, s
 As the project is yet to be implemented, there's much to discuss here. Though, it is assumed that if the jupyter notebook route is taken then running the kernel will run cell by cell. Otherwise, `main.py` will handle running the system as:
 
 `python main.py`
+
+## Data Links
+The following are links to the videos used for the project:
+* [Heart Attack](https://drive.google.com/open?id=10r1PMPqN7X6u0izZt65rKBxHasT3Op5D)
+* [Shrugged Over](https://drive.google.com/open?id=100IbuYzBk02FjJbImcZpKER4xCZmBpiI)
+* [Passed Out](https://drive.google.com/open?id=1X9EIen4oR8GP_xclCTCGF7rS3R31T6Mw)
+* [Merged Video](https://drive.google.com/open?id=12PwtwjR2nInM2vax1O1lDoEKeSGBpiFg)
