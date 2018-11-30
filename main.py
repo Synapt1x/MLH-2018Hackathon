@@ -17,7 +17,7 @@ import os
 import yaml
 import util
 import lk
-import cnn
+#import cnn
 
 
 def main():
@@ -34,6 +34,10 @@ def main():
     yaml_file = os.path.join(curdir, 'config.yaml')
     with open(yaml_file, "r") as f:
         config = yaml.load(f)
+
+    vid_dir = os.path.join(curdir, config['traindir'])
+
+    vid_names = util.load_data(vid_dir)
 
     #TODO: finish rest
 

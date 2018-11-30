@@ -14,7 +14,7 @@ __version__ = "0.1"
 
 import os
 
-import opencv
+import cv2
 import numpy as np
 
 

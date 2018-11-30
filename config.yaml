@@ -1,8 +1,8 @@
 # Parameters for the patient movement detection program
 #=====================================#
 
-traindir: vids/
-outputdir: output/
+traindir: data/vids/
+outputdir: data/output/
 
 approach: lk
 
