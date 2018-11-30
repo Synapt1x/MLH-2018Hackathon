@@ -3,6 +3,7 @@
 
 traindir: data/vids/
 outputdir: data/output/
+bg_img: data/vids/background.avi
 
 approach: lk
 
