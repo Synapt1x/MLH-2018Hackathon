@@ -37,7 +37,7 @@ def main():
 
     # Get video path
     vid_dir = os.path.join(curdir, config['traindir'])
-    vidPath = os.path.join(vid_dir, 'merged.avi')
+    vidPath = os.path.join(vid_dir, 'heartAttack_mpeg4.avi')
 
     # Open GUI
     opencvExample.App(Tk(),"Tkinter and OpenCV", vidPath)  

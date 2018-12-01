@@ -4,6 +4,7 @@ import PIL.Image, PIL.ImageTk
 import time
 import yaml
 import os
+import util
 import datetime
 import numpy as np
 
@@ -42,7 +43,7 @@ class App:
         self.vid = MyVideoCapture(self.video_source)
         
          # extract background subtraction image from bg vid
-        self.bg_file = os.path.join(curdir, config['bg_img'])
+        self.bg_file = os.path.join(self.curdir, self.config['bg_img'])
         _, _, self.bg_frame = util.load_video(self.bg_file)
     
         self.custom_lk = CustomLK()
@@ -110,11 +111,13 @@ class App:
                 self.firstIter = False
             else:
                 #give current and previous frames to chris
-                img, _, event, self.history = util.process_frame(self.prevFrame,self.curFrame,
-                                                        self.mask, self.custom_lk,
-                                                        self.haar_cascade, self.history)
-                
-                
+                if self.startERVA:
+                    img, _, event, self.history = util.process_frame(self.prevFrame,self.curFrame,
+                                                            self.mask, self.custom_lk,
+                                                            self.haar_cascade, self.history)
+                else:
+                    img = self.curFrame[40: 680, 70: 1210]
+
                 #show frame
                 outImg = cv2.resize(img, dsize = (853,480), interpolation = cv2.INTER_CUBIC)
                 outImg = PIL.Image.fromarray(outImg)

@@ -54,7 +54,7 @@ class FaceDetector:
         out_frame = orig_frame
         for (x, y, w, h) in boxes:
             out_frame = cv2.rectangle(orig_frame, (x, y), (x + w, y + h),
-                                  color=(0, 255, 0), thickness=2)
+                                  color=(255, 0, 0), thickness=2)
 
         return out_frame, boxes
 

@@ -102,15 +102,12 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     if len(next_frame.shape) > 2:
         next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
 
-    # get mask for ROIs
-    #_, dilated_mask = background_subtraction(init_frame, bg_frame, thresh=0.25)
-
     # apply hierarchical lucas-kanade optical flow
     u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
                                                       img_b=next_frame,
                                                       orig_b=orig_next_frame,
-                                                      levels=5,
-                                                      k_size=8,
+                                                      levels=4,
+                                                      k_size=24,
                                                       k_type="uniform",
                                                       sigma=0,
                                                       interpolation=cv2.INTER_CUBIC,
@@ -126,7 +123,7 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     # apply Haar detections to frame
     for (x, y, w, h) in boxes:
         next_frame = cv2.rectangle(img, (x, y), (x + w, y + h),
-                                  color=(255, 0, 0), thickness=3)
+                                  color=(0, 255, 0), thickness=3)
 
     return img, next_frame, event, history
 
@@ -168,7 +165,7 @@ def background_subtraction(frame, bg_frame, thresh=0.25,
     frame = cv2.medianBlur(frame, ksize=3)
 
     # zero out empty areas and dilate mask
-    mask[520:, :] = 0
+    mask[600:, :] = 0
     mask[:, 300: 470] = 0
     mask[:, :100] = 0
     mask[:, 1000:] = 0
