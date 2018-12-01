@@ -509,6 +509,8 @@ class CustomLK:
             v *= mask
 
         img = self.quiver(u, v, scale=75, stride=10)
-        img = cv2.add(orig_b[40:680, 70: 1210], img)
+        if orig_b.shape[:2] != (640, 1140):
+            orig_b = orig_b[40: 680, 70: 1210]
+        img = cv2.add(orig_b, img)
 
         return u, v, img, img_b

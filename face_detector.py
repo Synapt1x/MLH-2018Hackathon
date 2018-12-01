@@ -22,12 +22,19 @@ import util
 
 class FaceDetector:
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, type='face'):
 
         if config is not None:
             self.config = config
         self.detector = cv2.CascadeClassifier()
-        self.detector.load('haarcascade.xml')
+        if type == 'face':
+            self.detector.load('haarcascade.xml')
+        elif type == 'body':
+            self.detector.load('haarcascadebody.xml')
+        elif type == 'upper':
+            self.detector.load('haarcascadeupper.xml')
+        elif type == 'profile':
+            self.detector.load('haarcascadeprofile.xml')
 
     def process_frame(self, frame, target_size=(640, 1140)):
 

@@ -72,15 +72,12 @@ def extract_bg_image(vid_name):
 
     valid, video, init_frame = load_video(vid_name)
 
-    # TODO: Just to ensure it's working properly
-    # cv2.imshow('background image', init_frame)
-    # cv2.waitKey(0)
-
     if valid:
         return init_frame
 
 
-def process_frame(init_frame, next_frame, bg_frame, custom_lk, haar_classifier):
+def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
+                  haar_classifier):
     """
     Parse video for the relevant motion/lack-of-motion detection.
 
@@ -88,10 +85,12 @@ def process_frame(init_frame, next_frame, bg_frame, custom_lk, haar_classifier):
     :return:
     """
 
-    init_frame = init_frame[40: 680, 70: 1210]
+    if init_frame.shape[:2] != (640, 1140):
+        init_frame = init_frame[40: 680, 70: 1210]
 
+    if next_frame.shape[:2] != (640, 1140):
+        next_frame = next_frame[40: 680, 70: 1210]
     orig_next_frame = next_frame.copy()
-    next_frame = next_frame[40: 680, 70: 1210]
 
     # rescale to gray
     if len(init_frame.shape) > 2:
@@ -99,8 +98,10 @@ def process_frame(init_frame, next_frame, bg_frame, custom_lk, haar_classifier):
     if len(next_frame.shape) > 2:
         next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
 
-    _, dilated_mask = background_subtraction(init_frame, bg_frame, thresh=0.25)
+    # get mask for ROIs
+    #_, dilated_mask = background_subtraction(init_frame, bg_frame, thresh=0.25)
 
+    # apply hierarchical lucas-kanade optical flow
     u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
                                                       img_b=next_frame,
                                                       orig_b=orig_next_frame,
@@ -112,8 +113,10 @@ def process_frame(init_frame, next_frame, bg_frame, custom_lk, haar_classifier):
                                                       border_mode=cv2.BORDER_REPLICATE,
                                                       mask=dilated_mask)
 
+    # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
 
+    # apply Haar detections to frame
     for (x, y, w, h) in boxes:
         next_frame = cv2.rectangle(orig_next_frame, (x, y), (x + w, y + h),
                                   color=(0, 255, 0), thickness=2)
