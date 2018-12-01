@@ -29,7 +29,7 @@ class FaceDetector:
         self.detector = cv2.CascadeClassifier()
         self.detector.load('haarcascade.xml')
 
-    def process_frame(self, frame):
+    def process_frame(self, frame, target_size=(640, 1140)):
 
         orig_frame = frame.copy()
 
@@ -38,7 +38,7 @@ class FaceDetector:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # reshape to correct size
-        if frame.shape[:2] != (640, 1140):
+        if frame.shape[:2] != target_size:
             orig_frame = orig_frame[40: 680, 70: 1210]
             frame = frame[40: 680, 70: 1210]
 
@@ -48,8 +48,8 @@ class FaceDetector:
         for (x, y, w, h) in boxes:
             out_frame = cv2.rectangle(orig_frame, (x, y), (x + w, y + h),
                                   color=(0, 255, 0), thickness=2)
-        cv2.imshow('frame', out_frame)
-        cv2.waitKey(10)
+
+        return out_frame, boxes
 
 
 if __name__ == '__main__':

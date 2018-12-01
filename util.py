@@ -80,7 +80,7 @@ def extract_bg_image(vid_name):
         return init_frame
 
 
-def process_frame(init_frame, next_frame, bg_frame):
+def process_frame(init_frame, next_frame, bg_frame, custom_lk, haar_classifier):
     """
     Parse video for the relevant motion/lack-of-motion detection.
 
@@ -101,8 +101,6 @@ def process_frame(init_frame, next_frame, bg_frame):
 
     _, dilated_mask = background_subtraction(init_frame, bg_frame, thresh=0.25)
 
-    custom_lk = CustomLK()
-
     u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
                                                       img_b=next_frame,
                                                       orig_b=orig_next_frame,
@@ -113,6 +111,12 @@ def process_frame(init_frame, next_frame, bg_frame):
                                                       interpolation=cv2.INTER_CUBIC,
                                                       border_mode=cv2.BORDER_REPLICATE,
                                                       mask=dilated_mask)
+
+    _, boxes = haar_classifier.process_frame(orig_next_frame)
+
+    for (x, y, w, h) in boxes:
+        next_frame = cv2.rectangle(orig_next_frame, (x, y), (x + w, y + h),
+                                  color=(0, 255, 0), thickness=2)
 
     return img, next_frame
 
