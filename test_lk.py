@@ -83,8 +83,8 @@ def test_lk():
 
         u, v = custom_lk.hierarchical_lk(img_a=init_frame,
                                          img_b=next_frame,
-                                         levels=4,
-                                         k_size=12,
+                                         levels=5,
+                                         k_size=8,
                                          k_type="uniform",
                                          sigma=0,
                                          interpolation=cv2.INTER_CUBIC,
