@@ -81,29 +81,21 @@ def test_lk():
 
         print("Frame:", frame_num)
 
-        u, v = custom_lk.hierarchical_lk(img_a=init_frame,
+        u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
                                          img_b=next_frame,
+                                         orig_b=orig_next_frame,
                                          levels=5,
                                          k_size=8,
                                          k_type="uniform",
                                          sigma=0,
                                          interpolation=cv2.INTER_CUBIC,
-                                         border_mode=cv2.BORDER_REPLICATE)
+                                         border_mode=cv2.BORDER_REPLICATE,
+                                         mask=dilated_mask)
 
-        u = u / np.max(u)
-        v = v / np.max(v)
+        cv2.imshow('img.png', img)
+        cv2.waitKey(10)
 
-        dilated_mask *= 255
-        u *= dilated_mask / 255.
-        v *= dilated_mask / 255.
-
-        img = custom_lk.quiver(u, v, scale=75, stride=10)
-        img = cv2.add(orig_next_frame[40:680, 70: 1210], img)
-
-        # cv2.imshow('img.png', img)
-        # cv2.waitKey(10)
-
-        writer.write(img)
+        # writer.write(img)
 
         init_frame = next_frame.copy()
         valid, next_frame = video.read()

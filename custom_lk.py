@@ -415,8 +415,8 @@ class CustomLK:
 
         return remapped_img
 
-    def hierarchical_lk(self, img_a, img_b, levels, k_size, k_type, sigma,
-                        interpolation, border_mode):
+    def hierarchical_lk(self, img_a, img_b, orig_b, levels, k_size, k_type,
+                        sigma, interpolation, border_mode, mask=None):
         """Computes the optic flow using Hierarchical Lucas-Kanade.
 
         This method should use reduce_image(), expand_image(), warp(),
@@ -501,4 +501,14 @@ class CustomLK:
 
                 u, v = u * 2, v * 2
 
-        return u, v
+        u = u / np.max(u)
+        v = v / np.max(v)
+
+        if mask is not None:
+            u *= mask
+            v *= mask
+
+        img = self.quiver(u, v, scale=75, stride=10)
+        img = cv2.add(orig_b[40:680, 70: 1210], img)
+
+        return u, v, img, img_b
