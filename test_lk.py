@@ -44,8 +44,9 @@ def test_lk():
 
     # extract background subtraction image from bg vid
     bg_file = os.path.join(curdir, config['bg_img'])
+    bg_valid, bg_video, bg_frame = util.load_video(bg_file)
 
-    valid, video, frame = util.load_video(vid_names[0])
+    valid, video, frame = util.load_video(vid_names[1])
     init_frame = frame[40: 680, 70: 1210]
 
     valid, next_frame = video.read()
@@ -58,29 +59,61 @@ def test_lk():
     if len(next_frame.shape) > 2:
         next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
 
-    lk = LK()
+    _, mask = util.background_subtraction(init_frame, bg_frame, thresh=0.25)
+    mask[:140, :] = 0
+    mask[520:, :] = 0
+    mask[:, 150: 220] = 0
+    mask[:, :100] = 0
+    mask[:, 1000:] = 0
+    elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
+    dilated_mask = cv2.dilate(mask, kernel=elem)
 
+    # lk = LK()
     # lk.process_frame(init_frame, next_frame, bg_file=bg_file)
 
     custom_lk = CustomLK()
 
-    u, v = custom_lk.hierarchical_lk(img_a=init_frame,
-                                     img_b=next_frame,
-                                     levels=5,
-                                     k_size=8,
-                                     k_type="uniform",
-                                     sigma=0,
-                                     interpolation=cv2.INTER_CUBIC,
-                                     border_mode=cv2.BORDER_REPLICATE)
-    print("u:", u, "v:", v)
+    writer = cv2.VideoWriter('output.avi', -1, 20, (1140, 640))
 
-    u = u / np.max(u)
-    v = v / np.max(v)
+    frame_num = 1
 
-    img = custom_lk.quiver(u, v, scale=100, stride=10)
-    img = cv2.add(orig_next_frame[40:680, 70: 1210], img)
-    cv2.imshow('img.png', img)
-    cv2.waitKey(0)
+    while valid:
+
+        print("Frame:", frame_num)
+
+        u, v = custom_lk.hierarchical_lk(img_a=init_frame,
+                                         img_b=next_frame,
+                                         levels=4,
+                                         k_size=12,
+                                         k_type="uniform",
+                                         sigma=0,
+                                         interpolation=cv2.INTER_CUBIC,
+                                         border_mode=cv2.BORDER_REPLICATE)
+
+        u = u / np.max(u)
+        v = v / np.max(v)
+
+        dilated_mask *= 255
+        u *= dilated_mask / 255.
+        v *= dilated_mask / 255.
+
+        img = custom_lk.quiver(u, v, scale=75, stride=10)
+        img = cv2.add(orig_next_frame[40:680, 70: 1210], img)
+
+        # cv2.imshow('img.png', img)
+        # cv2.waitKey(10)
+
+        writer.write(img)
+
+        init_frame = next_frame.copy()
+        valid, next_frame = video.read()
+        orig_next_frame = next_frame.copy()
+        next_frame = next_frame[40: 680, 70: 1210]
+        next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
+
+        frame_num += 1
+
+    writer.release()
 
 
 if __name__ == '__main__':

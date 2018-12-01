@@ -95,7 +95,8 @@ def process_video(vid_name, bg_frame):
         #TODO: Finish
 
 
-def background_subtraction(frame, bg_frame, thresh=0.2):
+def background_subtraction(frame, bg_frame, thresh=0.2, target_size=(640,
+                                                                     1140)):
     """
     Uses background subtraction to subtract out stationarity in frame diffs.
 
@@ -104,16 +105,19 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
     :return:
     """
 
-    if frame.shape[:2] != (640, 1140):
+    if frame.shape[:2] != target_size:
         frame = frame[40: 680, 70: 1210]
-    if bg_frame.shape[:2] != (640, 1140):
+    if bg_frame.shape[:2] != target_size:
         bg_frame = bg_frame[32: 672, 60: 1200]
 
     mask = np.zeros(shape=frame.shape[:2], dtype=np.uint8)
-    img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    if len(frame.shape) != 2:
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    else:
+        img = frame
     bg_img = cv2.cvtColor(bg_frame, cv2.COLOR_BGR2GRAY)
 
-    if frame.shape == bg_frame.shape:
+    if img.shape == bg_img.shape:
         diff = np.abs((img / 255.) - (bg_img / 255.))
     else:
         # create mask based on thresholded correlation between frames
@@ -129,7 +133,7 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
 
     frame = cv2.medianBlur(frame, ksize=3)
 
-    return frame
+    return frame, mask
 
 
 if __name__ == '__main__':
