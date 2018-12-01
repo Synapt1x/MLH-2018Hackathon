@@ -18,6 +18,7 @@ import os
 import glob
 import cv2
 import numpy as np
+from custom_lk import CustomLK
 
 
 def load_data(dir_name=None):
@@ -79,7 +80,7 @@ def extract_bg_image(vid_name):
         return init_frame
 
 
-def process_video(vid_name, bg_frame):
+def process_frame(init_frame, next_frame, bg_frame):
     """
     Parse video for the relevant motion/lack-of-motion detection.
 
@@ -87,16 +88,37 @@ def process_video(vid_name, bg_frame):
     :return:
     """
 
-    valid, video, frame = load_video(vid_name)
+    init_frame = init_frame[40: 680, 70: 1210]
 
-    while valid:
-        diff_frame = background_subtraction(frame, bg_frame, thresh=0.2)
+    orig_next_frame = next_frame.copy()
+    next_frame = next_frame[40: 680, 70: 1210]
 
-        #TODO: Finish
+    # rescale to gray
+    if len(init_frame.shape) > 2:
+        init_frame = cv2.cvtColor(init_frame, cv2.COLOR_BGR2GRAY)
+    if len(next_frame.shape) > 2:
+        next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
+
+    _, dilated_mask = background_subtraction(init_frame, bg_frame, thresh=0.25)
+
+    custom_lk = CustomLK()
+
+    u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
+                                                      img_b=next_frame,
+                                                      orig_b=orig_next_frame,
+                                                      levels=5,
+                                                      k_size=8,
+                                                      k_type="uniform",
+                                                      sigma=0,
+                                                      interpolation=cv2.INTER_CUBIC,
+                                                      border_mode=cv2.BORDER_REPLICATE,
+                                                      mask=dilated_mask)
+
+    return img, next_frame
 
 
-def background_subtraction(frame, bg_frame, thresh=0.2, target_size=(640,
-                                                                     1140)):
+def background_subtraction(frame, bg_frame, thresh=0.2,
+                           target_size=(640, 1140)):
     """
     Uses background subtraction to subtract out stationarity in frame diffs.
 
@@ -123,17 +145,24 @@ def background_subtraction(frame, bg_frame, thresh=0.2, target_size=(640,
         # create mask based on thresholded correlation between frames
         diff = cv2.filter2D(img, ddepth=-1, kernel=bg_img)
 
+    # threshold mask
     mask[diff <= thresh] = 0
     mask[diff > thresh] = 1
 
-    # structure_elem = cv2.getStructuringElement(shape=cv2.MORPH_ELLIPSE, ksize=3)
-    # new_mask = cv2.dilate(mask, kernel=structure_elem)
-
+    # apply mask to frame and median filter
     frame = cv2.bitwise_and(frame, frame, mask=mask)
-
     frame = cv2.medianBlur(frame, ksize=3)
 
-    return frame, mask
+    # zero out empty areas and dilate mask
+    mask[:140, :] = 0
+    mask[520:, :] = 0
+    mask[:, 150: 220] = 0
+    mask[:, :100] = 0
+    mask[:, 1000:] = 0
+    elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
+    dilated_mask = cv2.dilate(mask, kernel=elem)
+
+    return frame, dilated_mask
 
 
 if __name__ == '__main__':
