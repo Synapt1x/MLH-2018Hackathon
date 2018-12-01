@@ -77,6 +77,7 @@ class App:
         self.firstIter = True
         self.startERVA = False
         self.history = None
+        self.flag = False
         
         #After it is called once, the update method will be automatically called
         self.delay = 15 # ms
@@ -115,6 +116,11 @@ class App:
                     img, _, event, self.history = util.process_frame(self.prevFrame,self.curFrame,
                                                             self.mask, self.custom_lk,
                                                             self.haar_cascade, self.history)
+                    if(~self.flag & event):
+                        self.history = None
+                        self.flag = True
+                        self.popupmsg('2')
+                  
                 else:
                     img = self.curFrame[40: 680, 70: 1210]
 
@@ -141,6 +147,7 @@ class App:
         timeStamp = datetime.datetime.now()
         fid.write(str(timeStamp) +',' + entry + '\n')
         fid.close()
+        self.flag = False
         
     def entryCallback(self):
         print(self.strVar.get())
