@@ -65,6 +65,8 @@ def test_lk():
 
     history = None
 
+    print("Working dir:", os.getcwd())
+
     while valid:
 
         img, frame, event, history = util.process_frame(init_frame, next_frame,
