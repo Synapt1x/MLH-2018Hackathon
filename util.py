@@ -72,8 +72,8 @@ def extract_bg_image(vid_name):
     valid, video, init_frame = load_video(vid_name)
 
     # TODO: Just to ensure it's working properly
-    cv2.imshow('background image', init_frame)
-    cv2.waitKey(0)
+    # cv2.imshow('background image', init_frame)
+    # cv2.waitKey(0)
 
     if valid:
         return init_frame
@@ -103,8 +103,6 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
     :param bg_frame:
     :return:
     """
-
-    #TODO: May not work without exact bg frame
 
     mask = np.zeros(shape=frame.shape[:2], dtype=np.uint8)
     img = cv2.cvtColor(frame.copy(), cv2.COLOR_RGB2GRAY)
