@@ -25,19 +25,54 @@ class LK:
         if config is not None:
             self.config = config
 
-    def process_frame(self, prev_frame, frame):
+    def process_frame(self, prev_frame, frame, features=None):
 
+        # rescale to gray
         if len(prev_frame.shape) > 2:
             prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_RGB2GRAY)
-
         if len(frame.shape) > 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-        features = cv2.goodFeaturesToTrack(image=prev_frame,
-                                           maxCorners=0,
-                                           qualityLevel=1.0,
-                                           minDistance=1.0)
-        output = cv2.calcOpticalFlowPyrLK(prev_frame, frame, features)
+        # reshape to correct size
+        if prev_frame.shape[:2] != (640, 1140):
+            prev_frame = prev_frame[32: 672, 60: 1200]
+        if frame.shape[:2] != (640, 1140):
+            frame = frame[32: 672, 60: 1200]
+
+        mask = np.zeros_like(frame, dtype=np.float)
+
+        # if features not passed in; extract good features
+        if features is None:
+            features = cv2.goodFeaturesToTrack(image=prev_frame,
+                                               maxCorners=100,
+                                               qualityLevel=0.3,
+                                               minDistance=7,
+                                               blockSize=7)
+
+        new_features, st, err = cv2.calcOpticalFlowPyrLK(prev_frame, frame,
+                                                     features,
+                                          None,
+                                          winSize=(21, 21),
+                                          maxLevel=5,
+                                          criteria=(
+                                          cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT,
+                                          10, 0.03))
+
+        new_locs = new_features[st == 1].astype(np.int)
+        old_locs = features[st == 1].astype(np.int)
+
+        for i, (new_pnt, old_pnt) in enumerate(zip(new_locs, old_locs)):
+            new_pnt = tuple(new_pnt)
+            old_pnt = tuple(old_pnt)
+            cv2.line(mask, new_pnt, old_pnt, color=(0, 255, 0), thickness=2)
+            cv2.circle(mask, new_pnt, color=(255, 0, 0), radius=5, thickness=2)
+
+        final_frame = cv2.add(frame, mask.astype(np.uint8))
+
+        cv2.imshow("moving in frame", final_frame)
+        cv2.waitKey(0)
+
+        return frame, final_frame
 
 
 
