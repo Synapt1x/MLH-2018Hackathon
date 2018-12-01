@@ -51,9 +51,7 @@ def test_lk():
 
     lk = LK()
 
-    lk.process_frame(init_frame, next_frame)
-
-
+    lk.process_frame(init_frame, next_frame, bg_file=bg_file)
 
 
 if __name__ == '__main__':

@@ -16,6 +16,7 @@ import os
 
 import cv2
 import numpy as np
+import util
 
 
 class LK:
@@ -25,7 +26,17 @@ class LK:
         if config is not None:
             self.config = config
 
-    def process_frame(self, prev_frame, frame, features=None):
+    def process_frame(self, prev_frame, frame, features=None, bg_file=None):
+
+        bg_valid, bg_video, bg_frame = util.load_video(bg_file)
+
+        prev_frame = util.background_subtraction(prev_frame, bg_frame,
+                                                 thresh=0.15)
+        frame = util.background_subtraction(frame, bg_frame,
+                                            thresh=0.15)
+
+        cv2.imwrite('prev_frame.png', prev_frame)
+        cv2.imwrite('frame.png', frame)
 
         # rescale to gray
         if len(prev_frame.shape) > 2:
@@ -35,9 +46,9 @@ class LK:
 
         # reshape to correct size
         if prev_frame.shape[:2] != (640, 1140):
-            prev_frame = prev_frame[32: 672, 60: 1200]
+            prev_frame = prev_frame[40: 680, 70: 1210]
         if frame.shape[:2] != (640, 1140):
-            frame = frame[32: 672, 60: 1200]
+            frame = frame[40: 680, 70: 1210]
 
         mask = np.zeros_like(frame, dtype=np.float)
 
@@ -73,7 +84,6 @@ class LK:
         cv2.waitKey(0)
 
         return frame, final_frame
-
 
 
 if __name__ == '__main__':

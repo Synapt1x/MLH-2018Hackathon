@@ -104,8 +104,13 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
     :return:
     """
 
+    if frame.shape[:2] != (640, 1140):
+        frame = frame[40: 680, 70: 1210]
+    if bg_frame.shape[:2] != (640, 1140):
+        bg_frame = bg_frame[32: 672, 60: 1200]
+
     mask = np.zeros(shape=frame.shape[:2], dtype=np.uint8)
-    img = cv2.cvtColor(frame.copy(), cv2.COLOR_RGB2GRAY)
+    img = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     bg_img = cv2.cvtColor(bg_frame, cv2.COLOR_RGB2GRAY)
 
     if frame.shape == bg_frame.shape:
@@ -114,10 +119,15 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
         # create mask based on thresholded correlation between frames
         diff = cv2.filter2D(img, ddepth=-1, kernel=bg_img)
 
-    mask[diff > thresh] = 0
-    mask[diff <= thresh] = 1
+    mask[diff <= thresh] = 0
+    mask[diff > thresh] = 1
+
+    # structure_elem = cv2.getStructuringElement(shape=cv2.MORPH_ELLIPSE, ksize=3)
+    # new_mask = cv2.dilate(mask, kernel=structure_elem)
 
     frame = cv2.bitwise_and(frame, frame, mask=mask)
+
+    frame = cv2.medianBlur(frame, ksize=3)
 
     return frame
 
