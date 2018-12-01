@@ -35,7 +35,7 @@ class FaceDetector:
 
         # rescale to gray
         if len(frame.shape) > 2:
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # reshape to correct size
         if frame.shape[:2] != (640, 1140):

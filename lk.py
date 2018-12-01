@@ -40,9 +40,9 @@ class LK:
 
         # rescale to gray
         if len(prev_frame.shape) > 2:
-            prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_RGB2GRAY)
+            prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
         if len(frame.shape) > 2:
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # reshape to correct size
         if prev_frame.shape[:2] != (640, 1140):

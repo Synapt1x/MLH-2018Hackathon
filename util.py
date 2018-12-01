@@ -110,8 +110,8 @@ def background_subtraction(frame, bg_frame, thresh=0.2):
         bg_frame = bg_frame[32: 672, 60: 1200]
 
     mask = np.zeros(shape=frame.shape[:2], dtype=np.uint8)
-    img = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-    bg_img = cv2.cvtColor(bg_frame, cv2.COLOR_RGB2GRAY)
+    img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    bg_img = cv2.cvtColor(bg_frame, cv2.COLOR_BGR2GRAY)
 
     if frame.shape == bg_frame.shape:
         diff = np.abs((img / 255.) - (bg_img / 255.))
