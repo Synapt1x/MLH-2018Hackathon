@@ -77,13 +77,17 @@ def extract_bg_image(vid_name):
 
 
 def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
-                  haar_classifier):
+                  haar_classifier, history=None):
     """
     Parse video for the relevant motion/lack-of-motion detection.
 
     :param dir_name:
     :return:
     """
+
+    event = False
+    if history is None:
+        history = np.zeros(shape=(640, 1140))
 
     if init_frame.shape[:2] != (640, 1140):
         init_frame = init_frame[40: 680, 70: 1210]
@@ -112,19 +116,22 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
                                                       interpolation=cv2.INTER_CUBIC,
                                                       border_mode=cv2.BORDER_REPLICATE,
                                                       mask=dilated_mask)
+    big_u = u > 0.20
+    big_v = v > 0.20
+    history[big_u & big_v] += 1
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
 
     # apply Haar detections to frame
     for (x, y, w, h) in boxes:
-        next_frame = cv2.rectangle(orig_next_frame, (x, y), (x + w, y + h),
-                                  color=(0, 255, 0), thickness=2)
+        next_frame = cv2.rectangle(img, (x, y), (x + w, y + h),
+                                  color=(255, 0, 0), thickness=3)
 
-    return img, next_frame
+    return img, next_frame, event, history
 
 
-def background_subtraction(frame, bg_frame, thresh=0.2,
+def background_subtraction(frame, bg_frame, thresh=0.25,
                            target_size=(640, 1140)):
     """
     Uses background subtraction to subtract out stationarity in frame diffs.
@@ -161,12 +168,11 @@ def background_subtraction(frame, bg_frame, thresh=0.2,
     frame = cv2.medianBlur(frame, ksize=3)
 
     # zero out empty areas and dilate mask
-    mask[:140, :] = 0
     mask[520:, :] = 0
-    mask[:, 150: 220] = 0
+    mask[:, 300: 470] = 0
     mask[:, :100] = 0
     mask[:, 1000:] = 0
-    elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
+    elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (16, 16))
     dilated_mask = cv2.dilate(mask, kernel=elem)
 
     return frame, dilated_mask

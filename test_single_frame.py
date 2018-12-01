@@ -18,7 +18,6 @@ import yaml
 import util
 import numpy as np
 import cv2
-from lk import LK
 from custom_lk import CustomLK
 from face_detector import FaceDetector
 #import cnn
@@ -51,7 +50,8 @@ def test_lk():
 
     valid, next_frame = video.read()
 
-    _, mask = util.background_subtraction(init_frame, bg_frame, thresh=0.25)
+    bg_sub_img, mask = util.background_subtraction(init_frame, bg_frame,
+                                               thresh=0.25)
 
     # lk = LK()
     # lk.process_frame(init_frame, next_frame, bg_file=bg_file)
@@ -63,16 +63,21 @@ def test_lk():
 
     frame_num = 1
 
+    history = None
+
     while valid:
 
-        img, frame = util.process_frame(init_frame, next_frame, mask,
-                                        custom_lk, haar_cascade)
+        img, frame, event, history = util.process_frame(init_frame, next_frame,
+                                                        mask, custom_lk,
+                                                        haar_cascade, history)
 
         init_frame = next_frame.copy()
         valid, next_frame = video.read()
 
+        writer.write(img)
+
         cv2.imshow('image', img)
-        cv2.waitKey(0)
+        cv2.waitKey(2)
 
         frame_num += 1
 
