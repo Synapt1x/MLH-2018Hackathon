@@ -16,17 +16,17 @@ import os
 
 import yaml
 import util
-import lk
+#import lk
 #import cnn
 
-
+import opencvExample 
+from tkinter import *
 def main():
     """
     Main function for running the application.
 
     :return:
     """
-
     # get current directory to work relative to current file path
     curdir = os.path.dirname(__file__)
 
@@ -35,21 +35,12 @@ def main():
     with open(yaml_file, "r") as f:
         config = yaml.load(f)
 
-    # extract list of videos from data dir
+    # Get video path
     vid_dir = os.path.join(curdir, config['traindir'])
-    vid_names = util.load_data(vid_dir)
+    vidPath = os.path.join(vid_dir, 'merged.avi')
 
-    # extract background subtraction image from bg vid
-    bg_file = os.path.join(curdir, config['bg_img'])
-    bg_image = util.extract_bg_image(bg_file)
-
-    #TODO: finish rest and add GUI
-    clicked = True  # To be replaced by gui selection to start
-    if clicked:
-        util.process_video(vid_names[0], bg_image)  # just the first vid for now
-
-    print("vid names:", vid_names)
-
+    # Open GUI
+    opencvExample.App(Tk(),"Tkinter and OpenCV", vidPath)  
 
 if __name__ == '__main__':
     main()

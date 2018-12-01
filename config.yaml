@@ -4,7 +4,8 @@
 traindir: data/vids/
 outputdir: data/output/
 bg_img: data/vids/background.avi
-
+media: data/media
+output: data/output
 approach: lk
 
 # neural network parameters
