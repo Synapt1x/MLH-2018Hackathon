@@ -5,7 +5,9 @@ channels:
 dependencies:
 - absl-py=0.6.1=py36_1000
 - backports=1.0=py_2
+- backports.functools_lru_cache=1.5=py_1
 - backports.weakref=1.0.post1=py36_1000
+- blas=1.1=openblas
 - bleach=1.5.0=py36_0
 - bzip2=1.0.6=h470a237_2
 - ca-certificates=2018.10.15=ha4d7672_0
@@ -24,9 +26,9 @@ dependencies:
 - graphite2=1.3.12=hfc679d8_1
 - gst-plugins-base=1.12.5=hde13a9d_0
 - gstreamer=1.12.5=h5856ed1_0
-- h5py=2.7.0=np112py36_0
+- h5py=2.8.0=py36h097b052_4
 - harfbuzz=1.9.0=h04dbb29_1
-- hdf5=1.8.17=11
+- hdf5=1.10.3=hc401514_2
 - html5lib=0.9999999=py36_0
 - icu=58.2=hfc679d8_0
 - jasper=1.900.1=hff1ad4c_5
@@ -54,8 +56,9 @@ dependencies:
 - matplotlib=2.2.3=py36h8e2386c_0
 - ncurses=6.1=hfc679d8_1
 - nettle=3.3=0
+- numpy=1.15.2=py36_blas_openblashd3ea46f_1
 - openblas=0.2.20=8
-- opencv=3.1.0=np112py36_1
+- opencv=3.4.3=py36_blas_openblash1006a3a_201
 - openh264=1.8.0=hd28b015_0
 - openssl=1.0.2p=h470a237_1
 - pcre=8.41=hfc679d8_3
@@ -71,6 +74,7 @@ dependencies:
 - pyyaml=3.13=py36h470a237_1
 - qt=5.6.2=hf70d934_9
 - readline=7.0=haf1bffa_1
+- scipy=1.1.0=py36_blas_openblashd3ea46f_201
 - sip=4.18.1=py36hfc679d8_0
 - six=1.11.0=py36_1001
 - sqlite=3.25.3=hb1c47c0_0
@@ -98,16 +102,11 @@ dependencies:
 - xorg-xproto=7.0.31=h470a237_7
 - xz=5.2.4=h470a237_1
 - yaml=0.1.7=h470a237_1
-- blas=1.0=mkl
 - certifi=2016.2.28=py36_0
 - mkl=2017.0.3=0
-- numpy=1.12.1=py36_0
 - pip=9.0.1=py36_1
-- scipy=0.19.1=np112py36_0
 - setuptools=36.4.0=py36_1
 - wheel=0.29.0=py36_0
 - zlib=1.2.11=0
-- pip:
-  - tensorflow-tensorboard==1.5.1
 prefix: /home/synapt1x/anaconda3/envs/hackathon
 
