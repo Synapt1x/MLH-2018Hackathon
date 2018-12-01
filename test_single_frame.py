@@ -57,15 +57,13 @@ def test_lk():
     # lk.process_frame(init_frame, next_frame, bg_file=bg_file)
 
     custom_lk = CustomLK()
-    haar_cascade = FaceDetector('body')
+    haar_cascade = FaceDetector(curdir=curdir, type='face')
 
     # writer = cv2.VideoWriter('output.avi', -1, 20, (1140, 640))
 
     frame_num = 1
 
     history = None
-
-    print("Working dir:", os.getcwd())
 
     while valid:
 
