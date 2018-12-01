@@ -59,7 +59,7 @@ def test_lk():
     custom_lk = CustomLK()
     haar_cascade = FaceDetector('body')
 
-    writer = cv2.VideoWriter('output.avi', -1, 20, (1140, 640))
+    # writer = cv2.VideoWriter('output.avi', -1, 20, (1140, 640))
 
     frame_num = 1
 
@@ -74,14 +74,14 @@ def test_lk():
         init_frame = next_frame.copy()
         valid, next_frame = video.read()
 
-        writer.write(img)
+        # writer.write(img)
 
         cv2.imshow('image', img)
         cv2.waitKey(2)
 
         frame_num += 1
 
-    writer.release()
+    # writer.release()
 
 
 if __name__ == '__main__':
