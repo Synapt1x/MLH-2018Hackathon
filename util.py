@@ -85,7 +85,6 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     :return:
     """
 
-    event = False
     if history is None:
         history = np.zeros(shape=(640, 1140))
 
@@ -103,25 +102,32 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
         next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
 
     # apply hierarchical lucas-kanade optical flow
-    u, v, img, next_frame = custom_lk.hierarchical_lk(img_a=init_frame,
+    u, v, img, next_frame, history = custom_lk.hierarchical_lk(img_a=init_frame,
                                                       img_b=next_frame,
                                                       orig_b=orig_next_frame,
-                                                      levels=4,
-                                                      k_size=24,
+                                                      levels=7,
+                                                      k_size=12,
                                                       k_type="uniform",
                                                       sigma=0,
                                                       interpolation=cv2.INTER_CUBIC,
                                                       border_mode=cv2.BORDER_REPLICATE,
-                                                      mask=dilated_mask)
+                                                      mask=dilated_mask,
+                                                      history=history)
     big_u = u > 0.20
     big_v = v > 0.20
     history[big_u & big_v] += 1
+
+    event = np.any(history > 25)
+
+    print("event:", event)
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
 
     # apply Haar detections to frame
     for (x, y, w, h) in boxes:
+        if y > 540:
+            continue
         next_frame = cv2.rectangle(img, (x, y), (x + w, y + h),
                                   color=(0, 255, 0), thickness=3)
 
@@ -166,7 +172,7 @@ def background_subtraction(frame, bg_frame, thresh=0.25,
 
     # zero out empty areas and dilate mask
     mask[600:, :] = 0
-    mask[:, 300: 470] = 0
+    mask[:, 300: 540] = 0
     mask[:, :100] = 0
     mask[:, 1000:] = 0
     elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (16, 16))

@@ -53,6 +53,8 @@ class FaceDetector:
 
         out_frame = orig_frame
         for (x, y, w, h) in boxes:
+            if y > 540:
+                continue
             out_frame = cv2.rectangle(orig_frame, (x, y), (x + w, y + h),
                                   color=(255, 0, 0), thickness=2)
 

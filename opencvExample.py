@@ -108,7 +108,7 @@ class App:
             if self.firstIter:
                 self.prevFrame = self.curFrame
                 _, self.mask = util.background_subtraction(self.curFrame, self.bg_frame,
-                                               thresh=0.25)
+                                               thresh=0.15)
                 self.firstIter = False
             else:
                 #give current and previous frames to chris
