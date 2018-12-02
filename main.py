@@ -40,7 +40,7 @@ def main():
     vidPath = os.path.join(vid_dir, 'heartAttack_mpeg4.avi')
 
     # Open GUI
-    opencvExample.App(Tk(),"Tkinter and OpenCV", vidPath)  
+    opencvExample.App(Tk(),"ERVA (Emergency Room Video Assistant)", vidPath)  
 
 if __name__ == '__main__':
     main()
