@@ -11,13 +11,31 @@ class CustomLK:
         if config is not None:
             self.config = config
 
-    def quiver(self, u, v, scale, stride, color=(0, 255, 0)):
+    def quiver(self, u, v, scale, stride, color=(0, 255, 0), history=None):
 
         img_out = np.zeros((v.shape[0], u.shape[1], 3), dtype=np.uint8)
 
         for y in range(0, v.shape[0], stride):
 
             for x in range(0, u.shape[1], stride):
+
+                if history is not None:
+                    hist_val = history[y // stride, x // stride]
+                    if hist_val > 1:
+                        color = (0, 0, 255)
+                    if 0 < hist_val < 4:
+                        color = (0, 220, 30)
+                    elif 4 <= hist_val < 8:
+                        color = (0, 160, 90)
+                    elif 8 <= hist_val < 12:
+                        color = (0, 120, 120)
+                    elif 12 <= hist_val < 16:
+                        color = (0, 40, 220)
+                    elif hist_val > 16:
+                        color = (0, 0, 255)
+                else:
+                    color = (0, 255, 0)
+
                 cv2.line(img_out, (x, y), (x + int(u[y, x] * scale),
                                            y + int(v[y, x] * scale)), color, 2)
                 cv2.circle(img_out, (x + int(u[y, x] * scale),
@@ -416,7 +434,8 @@ class CustomLK:
         return remapped_img
 
     def hierarchical_lk(self, img_a, img_b, orig_b, levels, k_size, k_type,
-                        sigma, interpolation, border_mode, mask=None):
+                        sigma, interpolation, border_mode, mask=None,
+                        history=None, stride=10):
         """Computes the optic flow using Hierarchical Lucas-Kanade.
 
         This method should use reduce_image(), expand_image(), warp(),
@@ -504,13 +523,16 @@ class CustomLK:
         u = u / np.max(u)
         v = v / np.max(v)
 
+        u[:, :400] *= 0.4
+        v[:, :400] *= 0.4
+
         if mask is not None:
             u *= mask
             v *= mask
 
-        img = self.quiver(u, v, scale=75, stride=10)
+        img = self.quiver(u, v, scale=75, stride=stride, history=history)
         if orig_b.shape[:2] != (640, 1140):
             orig_b = orig_b[40: 680, 70: 1210]
         img = cv2.add(orig_b, img)
 
-        return u, v, img, img_b
+        return u, v, img, img_b, history
