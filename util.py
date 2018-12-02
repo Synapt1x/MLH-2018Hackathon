@@ -120,7 +120,7 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     big_v = big_v[::stride, ::stride]
     history[big_u & big_v] += 1
 
-    event = np.any(history > 5)
+    event = np.any(history > 10)
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
