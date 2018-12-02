@@ -77,7 +77,7 @@ def extract_bg_image(vid_name):
 
 
 def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
-                  haar_classifier, history=None):
+                  haar_classifier, history=None, stride=10):
     """
     Parse video for the relevant motion/lack-of-motion detection.
 
@@ -86,7 +86,7 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     """
 
     if history is None:
-        history = np.zeros(shape=(640, 1140))
+        history = np.zeros(shape=(640 // stride, 1140 // stride))
 
     if init_frame.shape[:2] != (640, 1140):
         init_frame = init_frame[40: 680, 70: 1210]
@@ -105,28 +105,29 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     u, v, img, next_frame, history = custom_lk.hierarchical_lk(img_a=init_frame,
                                                       img_b=next_frame,
                                                       orig_b=orig_next_frame,
-                                                      levels=7,
+                                                      levels=6,
                                                       k_size=12,
                                                       k_type="uniform",
                                                       sigma=0,
                                                       interpolation=cv2.INTER_CUBIC,
                                                       border_mode=cv2.BORDER_REPLICATE,
                                                       mask=dilated_mask,
-                                                      history=history)
+                                                      history=history,
+                                                      stride=stride)
     big_u = u > 0.20
     big_v = v > 0.20
+    big_u = big_u[::stride, ::stride]
+    big_v = big_v[::stride, ::stride]
     history[big_u & big_v] += 1
 
     event = np.any(history > 25)
-
-    print("event:", event)
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
 
     # apply Haar detections to frame
     for (x, y, w, h) in boxes:
-        if y > 540:
+        if y > 440 or x < 120:
             continue
         next_frame = cv2.rectangle(img, (x, y), (x + w, y + h),
                                   color=(0, 255, 0), thickness=3)

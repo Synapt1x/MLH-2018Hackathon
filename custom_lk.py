@@ -20,7 +20,9 @@ class CustomLK:
             for x in range(0, u.shape[1], stride):
 
                 if history is not None:
-                    hist_val = history[y, x]
+                    hist_val = history[y // stride, x // stride]
+                    if hist_val > 1:
+                        color = (0, 0, 255)
                     if 0 < hist_val < 4:
                         color = (0, 220, 30)
                     elif 4 <= hist_val < 8:
@@ -433,7 +435,7 @@ class CustomLK:
 
     def hierarchical_lk(self, img_a, img_b, orig_b, levels, k_size, k_type,
                         sigma, interpolation, border_mode, mask=None,
-                        history=None):
+                        history=None, stride=10):
         """Computes the optic flow using Hierarchical Lucas-Kanade.
 
         This method should use reduce_image(), expand_image(), warp(),
@@ -528,7 +530,7 @@ class CustomLK:
             u *= mask
             v *= mask
 
-        img = self.quiver(u, v, scale=75, stride=12, history=history)
+        img = self.quiver(u, v, scale=75, stride=stride, history=history)
         if orig_b.shape[:2] != (640, 1140):
             orig_b = orig_b[40: 680, 70: 1210]
         img = cv2.add(orig_b, img)
