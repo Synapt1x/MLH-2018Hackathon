@@ -114,20 +114,20 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
                                                       mask=dilated_mask,
                                                       history=history,
                                                       stride=stride)
-    big_u = u > 0.20
-    big_v = v > 0.20
+    big_u = u > 0.15
+    big_v = v > 0.15
     big_u = big_u[::stride, ::stride]
     big_v = big_v[::stride, ::stride]
     history[big_u & big_v] += 1
 
-    event = np.any(history > 25)
+    event = np.any(history > 5)
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
 
     # apply Haar detections to frame
     for (x, y, w, h) in boxes:
-        if y > 440 or x < 120:
+        if y > 320 or x < 120:
             continue
         next_frame = cv2.rectangle(img, (x, y), (x + w, y + h),
                                   color=(0, 255, 0), thickness=3)
