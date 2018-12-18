@@ -42,66 +42,6 @@ class CustomLK:
                                      y + int(v[y, x] * scale)), 1, color, 1)
         return img_out
 
-    # Utility function
-    def normalize_and_scale(self, image_in, scale_range=(0, 255)):
-        """Normalizes and scales an image to a given range [0, 255].
-
-        Utility function. There is no need to modify it.
-
-        Args:
-            image_in (numpy.array): input image.
-            scale_range (tuple): range values (min, max). Default set to
-                                 [0, 255].
-
-        Returns:
-            numpy.array: output image.
-        """
-        image_out = np.zeros(image_in.shape)
-        cv2.normalize(image_in, image_out, alpha=scale_range[0],
-                      beta=scale_range[1], norm_type=cv2.NORM_MINMAX)
-
-        return image_out
-
-    def gradient_x(self, image):
-        """Computes image gradient in X direction.
-
-        Use cv2.Sobel to help you with this function. Additionally you
-        should set cv2.Sobel's 'scale' parameter to one eighth and ksize
-        to 3.
-
-        Args:
-            image (numpy.array): grayscale floating-point image with
-                                 values in [0.0, 1.0].
-
-        Returns:
-            numpy.array: image gradient in the X direction. Output
-                         from cv2.Sobel.
-        """
-
-        sobel = cv2.Sobel(image, ddepth=-1, dx=1, dy=0, ksize=3, scale=0.125)
-
-        return sobel
-
-    def gradient_y(self, image):
-        """Computes image gradient in Y direction.
-
-        Use cv2.Sobel to help you with this function. Additionally you
-        should set cv2.Sobel's 'scale' parameter to one eighth and ksize
-        to 3.
-
-        Args:
-            image (numpy.array): grayscale floating-point image with
-                                 values in [0.0, 1.0].
-
-        Returns:
-            numpy.array: image gradient in the Y direction.
-                         Output from cv2.Sobel.
-        """
-
-        sobel = cv2.Sobel(image, ddepth=-1, dx=0, dy=1, ksize=3, scale=0.125)
-
-        return sobel
-
     def optic_flow_lk(self, img_a, img_b, k_size, k_type, sigma=1):
         """Computes optic flow using the Lucas-Kanade method.
 
@@ -152,8 +92,8 @@ class CustomLK:
         tol = 1E-12
 
         # determine Ix and Iy for either image (here using img_a)
-        i_x = self.gradient_x(img_a)
-        i_y = self.gradient_y(img_a)
+        i_x = cv2.Sobel(img_a, ddepth=-1, dx=1, dy=0, ksize=3, scale=0.125)
+        i_y = cv2.Sobel(img_a, ddepth=-1, dx=0, dy=1, ksize=3, scale=0.125)
 
         # calculate the temporal derivative
         i_t = img_b - img_a
@@ -262,47 +202,6 @@ class CustomLK:
             image = reduced_image
 
         return img_list
-
-    def create_combined_img(self, img_list):
-        """Stacks images from the input pyramid list side-by-side.
-
-        Ordering should be large to small from left to right.
-
-        See the problem set instructions for a reference on how the output
-        should look like.
-
-        Make sure you call normalize_and_scale() for each image in the
-        pyramid when populating img_out.
-
-        Args:
-            img_list (list): list with pyramid images.
-
-        Returns:
-            numpy.array: output image with the pyramid images stacked
-                         from left to right.
-        """
-
-        # first get the intiial image to normalize and store in output image
-        normed_initial = self.normalize_and_scale(img_list[0])
-        output_img = normed_initial
-
-        # iterate over pyramid
-        for img in img_list[1:]:
-
-            # normalize and scale the current image for imwrite
-            normed_img = self.normalize_and_scale(img)
-
-            # determine number of rows necessary to pad
-            num_extra_rows = normed_initial.shape[0] - normed_img.shape[0]
-
-            # add rows of 1's to match height
-            normed_img = np.vstack((normed_img, np.ones((num_extra_rows,
-                                     img.shape[1]), dtype=np.float64) * 255.))
-
-            # hstack image onto previous image layer
-            output_img = np.hstack((output_img, normed_img))
-
-        return output_img
 
     def expand_image(self, image):
         """Expands an image doubling its width and height.

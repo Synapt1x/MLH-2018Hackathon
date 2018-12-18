@@ -28,13 +28,13 @@ class FaceDetector:
             self.config = config
         self.detector = cv2.CascadeClassifier()
         if type == 'face':
-            self.detector.load(os.path.join(curdir, 'haarcascade.xml'))
+            self.detector.load(os.path.join(curdir, 'haarcascade-features/haarcascade.xml'))
         elif type == 'body':
-            self.detector.load(os.path.join(curdir, 'haarcascadebody.xml'))
+            self.detector.load(os.path.join(curdir, 'haarcascade-features/haarcascadebody.xml'))
         elif type == 'upper':
-            self.detector.load(os.path.join(curdir, 'haarcascadeupper.xml'))
+            self.detector.load(os.path.join(curdir, 'haarcascade-features/haarcascadeupper.xml'))
         elif type == 'profile':
-            self.detector.load(os.path.join(curdir, 'haarcascadeprofile.xml'))
+            self.detector.load(os.path.join(curdir, 'haarcascade-features/haarcascadeprofile.xml'))
 
     def process_frame(self, frame, target_size=(640, 1140)):
 

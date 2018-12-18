@@ -33,6 +33,12 @@ As the project is yet to be implemented, there's much to discuss here. Though, i
 
 `python main.py`
 
+This will start up the ERVA system controlled by a GUI that shows the video capture on the screen. For demonstrative purposes, a video from our pre-recorded video list is used to exemplify the operation of the ERVA system.
+
+Once the system is opened, the following GUI screen is presented:
+
+
+
 ## Data Links
 The following are links to the videos used for the project:
 * [Heart Attack](https://drive.google.com/open?id=10r1PMPqN7X6u0izZt65rKBxHasT3Op5D)

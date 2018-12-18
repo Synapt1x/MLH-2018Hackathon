@@ -120,7 +120,7 @@ def process_frame(init_frame, next_frame, dilated_mask, custom_lk,
     big_v = big_v[::stride, ::stride]
     history[big_u & big_v] += 1
 
-    event = np.any(history > 10)
+    event = np.any(history > 15)
 
     # apply Haar cascade to detect face/body
     _, boxes = haar_classifier.process_frame(orig_next_frame)
@@ -173,7 +173,7 @@ def background_subtraction(frame, bg_frame, thresh=0.25,
 
     # zero out empty areas and dilate mask
     mask[600:, :] = 0
-    mask[:, 300: 540] = 0
+    mask[:, 300: 500] = 0
     mask[:, :100] = 0
     mask[:, 1000:] = 0
     elem = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (16, 16))
