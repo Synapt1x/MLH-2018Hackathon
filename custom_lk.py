@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+""" Code developed during 2018 MLH hackathon at the University of Manitoba.
+
+Code adapted from my own old code.
+
+custom_lk.py: this contains the code for implementing the hierarchical Lucade-Kanade
+algorithm for optical flow estimation.
+"""
 
 import numpy as np
 import cv2
@@ -11,7 +20,21 @@ class CustomLK:
         if config is not None:
             self.config = config
 
-    def quiver(self, u, v, scale, stride, color=(0, 255, 0), history=None):
+    def draw_vectors(self, u, v, scale, stride, color=(0, 255, 0), history=None):
+        """ Method for displaying motion vectors on image frame 
+        
+        Args:
+            u (numpy.array): horizontal dim flow vectors
+            v (numpy.array): vertical dim flow vectors
+            scale (int): rescale size for motion vectors.
+            stride (float): increment amount for choosing which motion vectors to
+                            display.
+            color (tuple): color specified for motion vectors.
+            history (numpy.array): array containing history of flow vector counts.
+
+        Returns:
+            img_out (numpy.array): image with motion vectors displayed on top.
+        """
 
         img_out = np.zeros((v.shape[0], u.shape[1], 3), dtype=np.uint8)
 
@@ -42,16 +65,8 @@ class CustomLK:
                                      y + int(v[y, x] * scale)), 1, color, 1)
         return img_out
 
-    def optic_flow_lk(self, img_a, img_b, k_size, k_type, sigma=1):
-        """Computes optic flow using the Lucas-Kanade method.
-
-        For efficiency, you should apply a convolution-based method.
-
-        Note: Implement this method using the instructions in the lectures
-        and the documentation.
-
-        You are not allowed to use any OpenCV functions that are related
-        to Optic Flow.
+    def optic_flow_lk(self, img_a, img_b, k_size, sigma=1):
+        """ Computes optic flow using the Lucas-Kanade method.
 
         Args:
             img_a (numpy.array): grayscale floating-point image with
@@ -59,18 +74,8 @@ class CustomLK:
             img_b (numpy.array): grayscale floating-point image with
                                  values in [0.0, 1.0].
             k_size (int): size of averaging kernel to use for weighted
-                          averages. Here we assume the kernel window is a
-                          square so you will use the same value for both
-                          width and height.
-            k_type (str): type of kernel to use for weighted averaging,
-                          'uniform' or 'gaussian'. By uniform we mean a
-                          kernel with the only ones divided by k_size**2.
-                          To implement a Gaussian kernel use
-                          cv2.getGaussianKernel. The autograder will use
-                          'uniform'.
-            sigma (float): sigma value if gaussian is chosen. Default
-                           value set to 1 because the autograder does not
-                           use this parameter.
+                          averages.
+            sigma (float): sigma value if gaussian is chosen.
 
         Returns:
             tuple: 2-element tuple containing:
@@ -82,11 +87,7 @@ class CustomLK:
         """
 
         # create kernel for weighted averaging
-        if k_type == "gaussian":
-            dim = cv2.getGaussianKernel(k_size, sigma)
-            window = dim * dim.T
-        else:
-            window = np.ones((k_size, k_size)) / k_size ** 2
+        window = np.ones((k_size, k_size)) / k_size ** 2
 
         # set tolerance for finding singularities
         tol = 1E-12
@@ -130,21 +131,8 @@ class CustomLK:
 
         return u, v
 
-    def reduce_image(self, image):
-        """Reduces an image to half its shape.
-
-        The autograder will pass images with even width and height. It is
-        up to you to determine values with odd dimensions. For example the
-        output image can be the result of rounding up the division by 2:
-        (13, 19) -> (7, 10)
-
-        For simplicity and efficiency, implement a convolution-based
-        method using the 5-tap separable filter.
-
-        Follow the process shown in the lecture 6B-L3. Also refer to:
-        -  Burt, P. J., and Adelson, E. H. (1983). The Laplacian Pyramid
-           as a Compact Image Code
-        You can find the link in the problem set instructions.
+    def reduce(self, image):
+        """ Reduces an image to half its shape (downsampling).
 
         Args:
             image (numpy.array): grayscale floating-point image, values in
@@ -168,16 +156,7 @@ class CustomLK:
         return reduced_img
 
     def gaussian_pyramid(self, image, levels):
-        """Creates a Gaussian pyramid of a given image.
-
-        This method uses reduce_image() at each level. Each image is
-        stored in a list of length equal the number of levels.
-
-        The first element in the list ([0]) should contain the input
-        image. All other levels contain a reduced version of the previous
-        level.
-
-        All images in the pyramid should floating-point with values in
+        """ Creates a Gaussian pyramid of a given image.
 
         Args:
             image (numpy.array): grayscale floating-point image, values
@@ -195,7 +174,7 @@ class CustomLK:
         for _ in range(levels - 1):
 
             # run the REDUCE function to correctly downsample the image
-            reduced_image = self.reduce_image(image)
+            reduced_image = self.reduce(image)
 
             img_list.append(reduced_image)
 
@@ -203,17 +182,8 @@ class CustomLK:
 
         return img_list
 
-    def expand_image(self, image):
-        """Expands an image doubling its width and height.
-
-        For simplicity and efficiency, implement a convolution-based
-        method using the 5-tap separable filter.
-
-        Follow the process shown in the lecture 6B-L3. Also refer to:
-        -  Burt, P. J., and Adelson, E. H. (1983). The Laplacian Pyramid
-           as a Compact Image Code
-
-        You can find the link in the problem set instructions.
+    def expand(self, image):
+        """ Expands an image doubling its width and height (upsampling).
 
         Args:
             image (numpy.array): grayscale floating-point image, values
@@ -239,9 +209,7 @@ class CustomLK:
         return expanded_img
 
     def laplacian_pyramid(self, g_pyr):
-        """Creates a Laplacian pyramid from a given Gaussian pyramid.
-
-        This method uses expand_image() at each level.
+        """ Creates a Laplacian pyramid from a given Gaussian pyramid.
 
         Args:
             g_pyr (list): Gaussian pyramid, returned by gaussian_pyramid().
@@ -260,7 +228,7 @@ class CustomLK:
         for level in g_pyr[1:]:
 
             # expand next level by upsampling
-            expanded_image = self.expand_image(level)
+            expanded_image = self.expand(level)
 
             # if higher image is an odd shape then remove final row/col
             if higher_image.shape[0] % 2 != 0:
@@ -280,14 +248,7 @@ class CustomLK:
         return l_pyr
 
     def warp(self, image, U, V, interpolation, border_mode):
-        """Warps image using X and Y displacements (U and V).
-
-        This function uses cv2.remap. The autograder will use cubic
-        interpolation and the BORDER_REFLECT101 border mode. You may
-        change this to work with the problem set images.
-
-        See the cv2.remap documentation to read more about border and
-        interpolation methods.
+        """ Warps image using X and Y displacements (U and V).
 
         Args:
             image (numpy.array): grayscale floating-point image, values
@@ -332,13 +293,10 @@ class CustomLK:
 
         return remapped_img
 
-    def hierarchical_lk(self, img_a, img_b, orig_b, levels, k_size, k_type,
+    def hierarchical_lk(self, img_a, img_b, orig_b, levels, k_size,
                         sigma, interpolation, border_mode, mask=None,
                         history=None, stride=10):
-        """Computes the optic flow using Hierarchical Lucas-Kanade.
-
-        This method should use reduce_image(), expand_image(), warp(),
-        and optic_flow_lk().
+        """ Computes the optic flow using Hierarchical Lucas-Kanade.
 
         Args:
             img_a (numpy.array): grayscale floating-point image, values in
@@ -347,18 +305,20 @@ class CustomLK:
                                  [0.0, 1.0].
             levels (int): Number of levels.
             k_size (int): parameter to be passed to optic_flow_lk.
-            k_type (str): parameter to be passed to optic_flow_lk.
             sigma (float): parameter to be passed to optic_flow_lk.
             interpolation (Inter): parameter to be passed to warp.
             border_mode (BorderType): parameter to be passed to warp.
 
         Returns:
-            tuple: 2-element tuple containing:
+            tuple: 4-element tuple containing:
                 U (numpy.array): raw displacement (in pixels) along X-axis,
-                                 same size as the input images,
-                                 floating-point type.
+                                 same size as the input images as float.
                 V (numpy.array): raw displacement (in pixels) along Y-axis,
-                                 same size and type as U.
+                                 same size as the input images as float.
+                img (numpy.array): image of passed in frame along with motion
+                                   vectors displayed.
+                img_b (numpy.array): image of original passed in secondary frame.
+                history (numpy.array): history of flow vector counts.
         """
 
         # create the gaussian pyramids for each image
@@ -371,11 +331,11 @@ class CustomLK:
 
         # determine initial flow fields u and v
         u, v = self.optic_flow_lk(final_a, final_b,
-                             k_size, k_type, sigma)
+                             k_size, sigma)
 
         # expand u and v and double values
-        u = self.expand_image(u)
-        v = self.expand_image(v)
+        u = self.expand(u)
+        v = self.expand(v)
 
         u, v = u * 2, v * 2
 
@@ -392,7 +352,7 @@ class CustomLK:
             # get the delta_u and delta_v based on flow between warped b and
             # current a image
             delta_u, delta_v = self.optic_flow_lk(img_a_reduced, warped_img_b,
-                                 k_size, k_type, sigma)
+                                 k_size, sigma)
 
             # as before check to make there aren't extra rows/cols due to expand
             # operation
@@ -414,8 +374,8 @@ class CustomLK:
 
             # if haven't reached base level then expand and double to continue alg
             if level > 0:
-                u = self.expand_image(u)
-                v = self.expand_image(v)
+                u = self.expand(u)
+                v = self.expand(v)
 
                 u, v = u * 2, v * 2
 
@@ -429,7 +389,8 @@ class CustomLK:
             u *= mask
             v *= mask
 
-        img = self.quiver(u, v, scale=75, stride=stride, history=history)
+        # draw motion vectors on image prior to returning resulting image
+        img = self.draw_vectors(u, v, scale=75, stride=stride, history=history)
         if orig_b.shape[:2] != (640, 1140):
             orig_b = orig_b[40: 680, 70: 1210]
         img = cv2.add(orig_b, img)

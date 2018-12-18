@@ -4,6 +4,8 @@
 
 ## Project: ERVA - Emergency Room Video Assistant
 
+**Winner** of the overall *balanced* category at the 2018 MLH local hack day at the University of Manitoba on Dec 1, 2018.
+
 ## Setup
 
 If using anaconda, which is the recommended environment manager for this project, the working environment can be created from the conda environment .yml:
